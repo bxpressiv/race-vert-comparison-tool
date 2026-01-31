@@ -62,9 +62,10 @@ with analytics.track():
             # ... (omitted for brevity, keep your finalized chart code here)
             
             # Ensure the chart uses the new width parameter:
-            st.plotly_chart(fig, width="stretch")
+            st.plotly_chart(fig, use_container_width=True)
         else:
             st.write("---")
             st.info("Please select both an Event and a Year/Distance to view the comparison.")
+
 
 # --- END OF ANALYTICS WRAPPER ---
