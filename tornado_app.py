@@ -7,14 +7,20 @@ import streamlit_analytics2 as analytics
 # --- PAGE SETUP ---
 st.set_page_config(page_title="Race Vert Comparison by mkUltra.run", layout="wide")
 
-with analytics.track():
+# --- ANALYTICS PASSWORD SETUP ---
+# This looks into your Streamlit Cloud 'Secrets' for the password
+# It defaults to None if the secret isn't found
+analytics_password = st.secrets.get("analytics", {}).get("password", None)
+
+# --- ANALYTICS WRAPPER ---
+with analytics.track(password=analytics_password):
+    
     # --- LOGO & TITLE ---
     if os.path.exists("logo.png"):
         col_l, col_c, col_r = st.columns([1, 2, 1])
         with col_c:
             st.image("logo.png", use_container_width=True)
 
-    # Restored the full title here
     st.markdown("<h1 style='text-align: center;'>Race Vert Comparison by mkUltra.run</h1>", unsafe_allow_html=True)
     
     # --- VIEW TOGGLE ---
