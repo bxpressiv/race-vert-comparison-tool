@@ -8,12 +8,12 @@ import streamlit_analytics2 as analytics
 st.set_page_config(page_title="Race Vert Comparison by mkUltra.run", layout="wide")
 
 # --- ANALYTICS PASSWORD SETUP ---
-# This looks into your Streamlit Cloud 'Secrets' for the password
-# It defaults to None if the secret isn't found
-analytics_password = st.secrets.get("analytics", {}).get("password", None)
+# Look for [analytics] password = "..." in your Streamlit Secrets
+analytics_password = st.secrets.get("analytics", {}).get("password", "")
 
 # --- ANALYTICS WRAPPER ---
-with analytics.track(password=analytics_password):
+# Note: the argument name is 'unsafe_password' for this library
+with analytics.track(unsafe_password=analytics_password):
     
     # --- LOGO & TITLE ---
     if os.path.exists("logo.png"):
