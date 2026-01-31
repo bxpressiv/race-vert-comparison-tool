@@ -7,21 +7,25 @@ import streamlit_analytics2 as analytics
 # --- PAGE SETUP ---
 st.set_page_config(page_title="Race Vert Comparison by mkUltra.run", layout="wide")
 
-# --- ANALYTICS WRAPPER ---
 with analytics.track():
-    
-    # --- SIDEBAR ---
+    # --- LOGO & TITLE ---
+    # Centering the logo at the top of the main page
     if os.path.exists("logo.png"):
-        st.sidebar.image("logo.png", width=200)
+        col_l, col_c, col_r = st.columns([1, 2, 1])
+        with col_c:
+            st.image("logo.png", use_container_width=True)
 
-    view_mode = st.sidebar.radio(
+    st.markdown("<h1 style='text-align: center;'>Race Vert Comparison</h1>", unsafe_allow_html=True)
+    
+    # --- VIEW TOGGLE (Moved from Sidebar to Main) ---
+    view_mode = st.radio(
         "Select Comparison Metric:",
-        ["Distance (km)", "Percentage (%) of total race"]
+        ["Distance (km)", "Percentage (%) of total race"],
+        horizontal=True
     )
+    st.write("---")
 
-    st.markdown("<h1 style='text-align: center;'>Race Vert Comparison by mkUltra.run</h1>", unsafe_allow_html=True)
-
-    # --- DATA LOADING HIERARCHY ---
+    # --- DATA LOADING ---
     DATA_FOLDER = "race_data"
 
     def get_race_hierarchy(root_path):
@@ -118,10 +122,9 @@ with analytics.track():
                 barmode='relative', bargap=0.15, showlegend=False,
                 xaxis=dict(range=[-axis_range, axis_range], showticklabels=False, showgrid=False, zeroline=False, fixedrange=True),
                 yaxis=dict(title="", tickfont=dict(family="Arial Black", size=13), fixedrange=True),
-                margin=dict(l=100, r=200, t=100, b=50), height=850, template="plotly_white"
+                margin=dict(l=10, r=10, t=100, b=50), height=850, template="plotly_white"
             )
 
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.write("---")
             st.info("Please select both an Event and a Year/Distance to view the comparison.")
