@@ -7,15 +7,22 @@ import streamlit_analytics2 as analytics
 # --- PAGE SETUP ---
 st.set_page_config(page_title="Race Vert Comparison by mkUltra.run", layout="wide")
 
-# --- ANALYTICS PASSWORD SETUP ---
-# Look for [analytics] password = "..." in your Streamlit Secrets
+# --- MOBILE CSS FIX ---
+# This CSS ensures dropdowns (listboxes) are scrollable on touch devices
+st.markdown("""
+    <style>
+    div[role="listbox"] ul {
+        max-height: 300px;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 analytics_password = st.secrets.get("analytics", {}).get("password", "")
 
-# --- ANALYTICS WRAPPER ---
-# Note: the argument name is 'unsafe_password' for this library
 with analytics.track(unsafe_password=analytics_password):
     
-    # --- LOGO & TITLE ---
     if os.path.exists("logo.png"):
         col_l, col_c, col_r = st.columns([1, 2, 1])
         with col_c:
@@ -23,7 +30,6 @@ with analytics.track(unsafe_password=analytics_password):
 
     st.markdown("<h1 style='text-align: center;'>Race Vert Comparison by mkUltra.run</h1>", unsafe_allow_html=True)
     
-    # --- VIEW TOGGLE ---
     view_mode = st.radio(
         "Select Comparison Metric:",
         ["Distance (km)", "Percentage (%) of total race"],
@@ -31,7 +37,6 @@ with analytics.track(unsafe_password=analytics_password):
     )
     st.write("---")
 
-    # --- DATA LOADING ---
     DATA_FOLDER = "race_data"
 
     def get_race_hierarchy(root_path):
@@ -50,6 +55,7 @@ with analytics.track(unsafe_password=analytics_password):
     if not race_dict:
         st.info("Please organize your 'race_data' folder into subfolders.")
     else:
+        # On mobile, Streamlit automatically stacks these columns vertically
         col1, col2 = st.columns(2)
 
         with col1:
@@ -88,7 +94,8 @@ with analytics.track(unsafe_password=analytics_password):
             CUSTOM_COLORS = ["#803131", "#d63131", "#e77d31", "#efe331", "#d3d388", "#31d431", "#7fd1af", "#4ee6e6", "#3197e9", "#3b36db", "#682d94"]
             max_val = max(df_l[x_col].max(), df_r[x_col].max())
             gap_size = max_val * 0.013  
-            axis_range = max_val * 1.6 
+            # We slightly shrink the bar range to make room for the right-side text
+            axis_range = max_val * 1.7 
 
             fig = go.Figure()
 
@@ -97,7 +104,7 @@ with analytics.track(unsafe_password=analytics_password):
                 y=df_l[y_col], x=(df_l[x_col] * -1), orientation='h',
                 marker=dict(color=CUSTOM_COLORS[::-1]), base=-gap_size, 
                 text=df_l[x_col].apply(lambda x: f"<b>{x:.1f}{unit}</b>" if x > 0 else ""),
-                textposition='outside', cliponaxis=False, showlegend=False,
+                textposition='outside', cliponaxis=False,
                 hovertemplate="Grade: %{y}<br>Value: %{x|abs:.2f}" + unit + "<extra></extra>"
             ))
 
@@ -106,31 +113,33 @@ with analytics.track(unsafe_password=analytics_password):
                 y=df_r[y_col], x=df_r[x_col], orientation='h',
                 marker=dict(color=CUSTOM_COLORS[::-1]), base=gap_size, 
                 text=df_r[x_col].apply(lambda x: f"<b>{x:.1f}{unit}</b>" if x > 0 else ""),
-                textposition='outside', cliponaxis=False, showlegend=False,
+                textposition='outside', cliponaxis=False,
                 hovertemplate="Grade: %{y}<br>Value: %{x:.2f}" + unit + "<extra></extra>"
             ))
 
+            # Adjusted annotation positions to avoid cut-off
             for i, row in merged.iterrows():
                 d_val = row['delta']
                 color = "black" if abs(d_val) <= 1.0 else ("#d63131" if d_val > 0 else "#3197e9")
                 prefix = "+" if d_val > 0 else ""
                 fig.add_annotation(
-                    x=axis_range * 0.95, y=row[y_col], text=f"<b>{prefix}{d_val:.1f}{unit}</b>",
-                    showarrow=False, xanchor="center", font=dict(color=color, size=13, family="Arial Black")
+                    x=axis_range * 0.88, y=row[y_col], text=f"<b>{prefix}{d_val:.1f}{unit}</b>",
+                    showarrow=False, xanchor="right", font=dict(color=color, size=12, family="Arial Black")
                 )
 
             fig.add_annotation(
-                x=axis_range * 0.95, y=1.08, xref="x", yref="paper",
-                text="<b>Race B has:</b>", showarrow=False, xanchor="center", font=dict(size=14, family="Arial Black")
+                x=axis_range * 0.88, y=1.08, xref="x", yref="paper",
+                text="<b>Race B has:</b>", showarrow=False, xanchor="right", font=dict(size=13, family="Arial Black")
             )
 
             fig.update_layout(
                 barmode='relative', bargap=0.15, showlegend=False,
-                xaxis=dict(range=[-axis_range, axis_range], showticklabels=False, showgrid=False, zeroline=False, fixedrange=True),
-                yaxis=dict(title="", tickfont=dict(family="Arial Black", size=13), fixedrange=True),
-                margin=dict(l=10, r=10, t=100, b=50), height=850, template="plotly_white"
+                xaxis=dict(range=[-axis_range * 0.8, axis_range], showticklabels=False, showgrid=False, zeroline=False, fixedrange=True),
+                yaxis=dict(title="", tickfont=dict(family="Arial Black", size=11), fixedrange=True),
+                # Added significant right margin (r=80) to prevent text cut-off
+                margin=dict(l=10, r=80, t=100, b=50), height=850, template="plotly_white"
             )
 
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
         else:
             st.info("Please select both an Event and a Year/Distance to view the comparison.")
