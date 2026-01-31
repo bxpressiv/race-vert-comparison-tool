@@ -9,15 +9,15 @@ st.set_page_config(page_title="Race Vert Comparison by mkUltra.run", layout="wid
 
 with analytics.track():
     # --- LOGO & TITLE ---
-    # Centering the logo at the top of the main page
     if os.path.exists("logo.png"):
         col_l, col_c, col_r = st.columns([1, 2, 1])
         with col_c:
             st.image("logo.png", use_container_width=True)
 
-    st.markdown("<h1 style='text-align: center;'>Race Vert Comparison</h1>", unsafe_allow_html=True)
+    # Restored the full title here
+    st.markdown("<h1 style='text-align: center;'>Race Vert Comparison by mkUltra.run</h1>", unsafe_allow_html=True)
     
-    # --- VIEW TOGGLE (Moved from Sidebar to Main) ---
+    # --- VIEW TOGGLE ---
     view_mode = st.radio(
         "Select Comparison Metric:",
         ["Distance (km)", "Percentage (%) of total race"],
