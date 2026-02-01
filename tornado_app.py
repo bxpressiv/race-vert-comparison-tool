@@ -83,10 +83,24 @@ with analytics.track(unsafe_password=analytics_password):
             axis_range = max_val * 1.7 
 
             fig = go.Figure()
+
+            # --- RESTORED BAR LABELS ---
             # Left Bar
-            fig.add_trace(go.Bar(y=df_l[y_col], x=(df_l[x_col] * -1), orientation='h', marker=dict(color=CUSTOM_COLORS[::-1]), base=- (max_val * 0.01), text=df_l[x_col].apply(lambda x: f"<b>{x:.1f}</b>" if x > 0 else ""), textposition='outside', cliponaxis=False))
+            fig.add_trace(go.Bar(
+                y=df_l[y_col], x=(df_l[x_col] * -1), orientation='h', 
+                marker=dict(color=CUSTOM_COLORS[::-1]), 
+                base=- (max_val * 0.01), 
+                text=df_l[x_col].apply(lambda x: f"<b>{x:.1f}{unit}</b>" if x > 0 else ""), 
+                textposition='outside', cliponaxis=False
+            ))
             # Right Bar
-            fig.add_trace(go.Bar(y=df_r[y_col], x=df_r[x_col], orientation='h', marker=dict(color=CUSTOM_COLORS[::-1]), base=(max_val * 0.01), text=df_r[x_col].apply(lambda x: f"<b>{x:.1f}</b>" if x > 0 else ""), textposition='outside', cliponaxis=False))
+            fig.add_trace(go.Bar(
+                y=df_r[y_col], x=df_r[x_col], orientation='h', 
+                marker=dict(color=CUSTOM_COLORS[::-1]), 
+                base=(max_val * 0.01), 
+                text=df_r[x_col].apply(lambda x: f"<b>{x:.1f}{unit}</b>" if x > 0 else ""), 
+                textposition='outside', cliponaxis=False
+            ))
 
             # Differences
             for i, row in merged.iterrows():
