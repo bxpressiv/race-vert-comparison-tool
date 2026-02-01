@@ -41,23 +41,22 @@ with analytics.track(unsafe_password=analytics_password):
     if not race_dict:
         st.info("Please organize your 'race_data' folder.")
     else:
+        st.markdown("### 🏃 Select Races")
         col1, col2 = st.columns(2)
 
         with col1:
-            st.subheader("Race A (Left)")
-            # Using a searchable selectbox - clicking this on mobile usually opens 
-            # the phone's native picker which is easier to scroll.
-            sel_event_a = st.selectbox("Pick Event A", [" "] + list(race_dict.keys()), key="a_event")
+            st.markdown("#### Race A")
+            sel_event_a = st.selectbox("Event", [" "] + list(race_dict.keys()), key="a_event")
             sel_year_a = " "
             if sel_event_a != " ":
-                sel_year_a = st.selectbox("Pick Year/Dist A", [" "] + race_dict[sel_event_a], key="a_year")
+                sel_year_a = st.selectbox("Year/Distance", [" "] + race_dict[sel_event_a], key="a_year")
 
         with col2:
-            st.subheader("Race B (Right)")
-            sel_event_b = st.selectbox("Pick Event B", [" "] + list(race_dict.keys()), key="b_event")
+            st.markdown("#### Race B")
+            sel_event_b = st.selectbox("Event", [" "] + list(race_dict.keys()), key="b_event")
             sel_year_b = " "
             if sel_event_b != " ":
-                sel_year_b = st.selectbox("Pick Year/Dist B", [" "] + race_dict[sel_event_b], key="b_year")
+                sel_year_b = st.selectbox("Year/Distance", [" "] + race_dict[sel_event_b], key="b_year")
 
         # --- DATA & CHARTING ---
         if sel_year_a != " " and sel_year_b != " ":
@@ -67,7 +66,6 @@ with analytics.track(unsafe_password=analytics_password):
             df_l = pd.read_csv(path_a)
             df_r = pd.read_csv(path_b)
             
-            # Clean up columns
             for df in [df_l, df_r]:
                 df.columns = df.columns.str.strip()
             df_l = df_l.sort_values('sort', ascending=True)
@@ -97,7 +95,7 @@ with analytics.track(unsafe_password=analytics_password):
                 prefix = "+" if d_val > 0 else ""
                 fig.add_annotation(x=axis_range * 0.88, y=row[y_col], text=f"<b>{prefix}{d_val:.1f}{unit}</b>", showarrow=False, xanchor="right", font=dict(color=color, size=12))
 
-            fig.add_annotation(x=axis_range * 0.88, y=1.08, xref="x", yref="paper", text="<b>Race B diff:</b>", showarrow=False, xanchor="right", font=dict(size=13))
+            fig.add_annotation(x=axis_range * 0.88, y=1.08, xref="x", yref="paper", text="<b>Race B has:</b>", showarrow=False, xanchor="right", font=dict(size=13))
 
             fig.update_layout(barmode='relative', bargap=0.15, showlegend=False, xaxis=dict(range=[-axis_range * 0.8, axis_range], showticklabels=False, showgrid=False, zeroline=False, fixedrange=True), yaxis=dict(title="", tickfont=dict(size=11), fixedrange=True), margin=dict(l=10, r=80, t=100, b=50), height=850, template="plotly_white")
 
