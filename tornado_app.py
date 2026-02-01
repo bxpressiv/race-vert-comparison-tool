@@ -19,9 +19,17 @@ with analytics.track(unsafe_password=analytics_password):
 
     st.markdown("<h1 style='text-align: center;'>Race Vert Comparison by mkUltra.run</h1>", unsafe_allow_html=True)
     
-    # --- SIDEBAR ---
-    st.sidebar.header("Settings")
-    view_mode = st.sidebar.radio("Metric:", ["Distance (km)", "Percentage (%)"])
+    # --- METRIC TOGGLE (Back under the title) ---
+    # We use a container to center the radio buttons slightly
+    col_v1, col_v2, col_v3 = st.columns([1, 2, 1])
+    with col_v2:
+        view_mode = st.radio(
+            "Select Comparison Metric:",
+            ["Distance (km)", "Percentage (%)"],
+            horizontal=True,
+            label_visibility="collapsed" # Hides the small label to keep it cleaner
+        )
+    st.write("---")
 
     DATA_FOLDER = "race_data"
 
@@ -83,8 +91,7 @@ with analytics.track(unsafe_password=analytics_password):
             axis_range = max_val * 1.7 
 
             fig = go.Figure()
-
-            # --- RESTORED BAR LABELS ---
+            
             # Left Bar
             fig.add_trace(go.Bar(
                 y=df_l[y_col], x=(df_l[x_col] * -1), orientation='h', 
