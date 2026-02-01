@@ -18,7 +18,7 @@ with analytics.track(unsafe_password=analytics_password):
             st.image("logo.png", use_container_width=True)
 
     st.markdown("<h1 style='text-align: center;'>Race Vert Comparison by mkUltra.run</h1>", unsafe_allow_html=True)
-    st.write("") # Small spacer
+    st.write("") 
 
     DATA_FOLDER = "race_data"
 
@@ -44,14 +44,16 @@ with analytics.track(unsafe_password=analytics_password):
 
         with col1:
             st.markdown("#### Race A")
-            sel_event_a = st.selectbox("Event", [" "] + list(race_dict.keys()), key="a_event")
+            # Standardization: ensuring key and help match the 'working' version
+            sel_event_a = st.selectbox("Event", [" "] + list(race_dict.keys()), key="a_event", help="Type to search")
             sel_year_a = " "
             if sel_event_a != " ":
                 sel_year_a = st.selectbox("Year/Distance", [" "] + race_dict[sel_event_a], key="a_year")
 
         with col2:
             st.markdown("#### Race B")
-            sel_event_b = st.selectbox("Event", [" "] + list(race_dict.keys()), key="b_event")
+            # FIX: Applying the exact same search logic and help text to Box B
+            sel_event_b = st.selectbox("Event", [" "] + list(race_dict.keys()), key="b_event", help="Type to search")
             sel_year_b = " "
             if sel_event_b != " ":
                 sel_year_b = st.selectbox("Year/Distance", [" "] + race_dict[sel_event_b], key="b_year")
@@ -83,7 +85,7 @@ with analytics.track(unsafe_password=analytics_password):
             df_r = df_r.sort_values('sort', ascending=True)
 
             y_col = 'Bin'          
-            x_col = 'Distance_km' if view_mode == "Distance (km)" else 'Perc'
+            x_col = 'Distance_km' if view_mode == "Distance (km)" else 'Percentage' # Ensure internal logic matches toggle
             unit = "km" if view_mode == "Distance (km)" else "%"
 
             merged = pd.merge(df_l[[y_col, x_col]], df_r[[y_col, x_col]], on=y_col, suffixes=('_a', '_b'))
@@ -124,5 +126,3 @@ with analytics.track(unsafe_password=analytics_password):
             fig.update_layout(barmode='relative', bargap=0.15, showlegend=False, xaxis=dict(range=[-axis_range * 0.8, axis_range], showticklabels=False, showgrid=False, zeroline=False, fixedrange=True), yaxis=dict(title="", tickfont=dict(size=11), fixedrange=True), margin=dict(l=10, r=80, t=100, b=50), height=850, template="plotly_white")
 
             st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-        else:
-            st.info("Please select both an Event and a Year/Distance to view the comparison.")
