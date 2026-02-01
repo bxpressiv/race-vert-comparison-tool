@@ -18,6 +18,9 @@ with analytics.track(unsafe_password=analytics_password):
             st.image("logo.png", use_container_width=True)
 
     st.markdown("<h1 style='text-align: center;'>Race Vert Comparison by mkUltra.run</h1>", unsafe_allow_html=True)
+    
+    # --- NEW INSTRUCTION LINE ---
+    st.markdown("<p style='text-align: center; color: gray;'><i>Pro tip: Tap an event box and type the race name or acronym to search quickly.</i></p>", unsafe_allow_html=True)
     st.write("") 
 
     DATA_FOLDER = "race_data"
@@ -38,25 +41,24 @@ with analytics.track(unsafe_password=analytics_password):
     if not race_dict:
         st.info("Please organize your 'race_data' folder.")
     else:
-        # --- RACE SELECTIONS ---
+        # --- VERTICAL STACK FOR MOBILE RELIABILITY ---
         st.markdown("### 🏃 Select Races")
-        col1, col2 = st.columns(2)
+        
+        # RACE A
+        st.markdown("#### Race A")
+        sel_event_a = st.selectbox("Select Event A", [" "] + list(race_dict.keys()), key="event_picker_a")
+        sel_year_a = " "
+        if sel_event_a != " ":
+            sel_year_a = st.selectbox("Year/Distance A", [" "] + race_dict[sel_event_a], key="a_year")
 
-        with col1:
-            st.markdown("#### Race A")
-            # Unique label and key for Box A
-            sel_event_a = st.selectbox("Select Event A", [" "] + list(race_dict.keys()), key="event_picker_a")
-            sel_year_a = " "
-            if sel_event_a != " ":
-                sel_year_a = st.selectbox("Year/Distance", [" "] + race_dict[sel_event_a], key="a_year")
+        st.write("") # Spacer
 
-        with col2:
-            st.markdown("#### Race B")
-            # Changed label to "Select Event B" and unique key to distinguish from Box A
-            sel_event_b = st.selectbox("Select Event B", [" "] + list(race_dict.keys()), key="event_picker_b")
-            sel_year_b = " "
-            if sel_event_b != " ":
-                sel_year_b = st.selectbox("Year/Distance", [" "] + race_dict[sel_event_b], key="b_year")
+        # RACE B
+        st.markdown("#### Race B")
+        sel_event_b = st.selectbox("Select Event B", [" "] + list(race_dict.keys()), key="event_picker_b")
+        sel_year_b = " "
+        if sel_event_b != " ":
+            sel_year_b = st.selectbox("Year/Distance B", [" "] + race_dict[sel_event_b], key="b_year")
 
         st.write("---")
 
