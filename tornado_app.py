@@ -44,16 +44,16 @@ with analytics.track(unsafe_password=analytics_password):
 
         with col1:
             st.markdown("#### Race A")
-            # Standardization: ensuring key and help match the 'working' version
-            sel_event_a = st.selectbox("Event", [" "] + list(race_dict.keys()), key="a_event", help="Type to search")
+            # Unique label and key for Box A
+            sel_event_a = st.selectbox("Select Event A", [" "] + list(race_dict.keys()), key="event_picker_a")
             sel_year_a = " "
             if sel_event_a != " ":
                 sel_year_a = st.selectbox("Year/Distance", [" "] + race_dict[sel_event_a], key="a_year")
 
         with col2:
             st.markdown("#### Race B")
-            # FIX: Applying the exact same search logic and help text to Box B
-            sel_event_b = st.selectbox("Event", [" "] + list(race_dict.keys()), key="b_event", help="Type to search")
+            # Changed label to "Select Event B" and unique key to distinguish from Box A
+            sel_event_b = st.selectbox("Select Event B", [" "] + list(race_dict.keys()), key="event_picker_b")
             sel_year_b = " "
             if sel_event_b != " ":
                 sel_year_b = st.selectbox("Year/Distance", [" "] + race_dict[sel_event_b], key="b_year")
@@ -85,7 +85,7 @@ with analytics.track(unsafe_password=analytics_password):
             df_r = df_r.sort_values('sort', ascending=True)
 
             y_col = 'Bin'          
-            x_col = 'Distance_km' if view_mode == "Distance (km)" else 'Percentage' # Ensure internal logic matches toggle
+            x_col = 'Distance_km' if view_mode == "Distance (km)" else 'Perc'
             unit = "km" if view_mode == "Distance (km)" else "%"
 
             merged = pd.merge(df_l[[y_col, x_col]], df_r[[y_col, x_col]], on=y_col, suffixes=('_a', '_b'))
