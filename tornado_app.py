@@ -18,18 +18,7 @@ with analytics.track(unsafe_password=analytics_password):
             st.image("logo.png", use_container_width=True)
 
     st.markdown("<h1 style='text-align: center;'>Race Vert Comparison by mkUltra.run</h1>", unsafe_allow_html=True)
-    
-    # --- METRIC TOGGLE (Back under the title) ---
-    # We use a container to center the radio buttons slightly
-    col_v1, col_v2, col_v3 = st.columns([1, 2, 1])
-    with col_v2:
-        view_mode = st.radio(
-            "Select Comparison Metric:",
-            ["Distance (km)", "Percentage (%)"],
-            horizontal=True,
-            label_visibility="collapsed" # Hides the small label to keep it cleaner
-        )
-    st.write("---")
+    st.write("") # Small spacer
 
     DATA_FOLDER = "race_data"
 
@@ -49,6 +38,7 @@ with analytics.track(unsafe_password=analytics_password):
     if not race_dict:
         st.info("Please organize your 'race_data' folder.")
     else:
+        # --- RACE SELECTIONS ---
         st.markdown("### 🏃 Select Races")
         col1, col2 = st.columns(2)
 
@@ -66,8 +56,21 @@ with analytics.track(unsafe_password=analytics_password):
             if sel_event_b != " ":
                 sel_year_b = st.selectbox("Year/Distance", [" "] + race_dict[sel_event_b], key="b_year")
 
+        st.write("---")
+
         # --- DATA & CHARTING ---
         if sel_year_a != " " and sel_year_b != " ":
+            
+            # --- CENTRED RADIO BUTTONS (Above Graph) ---
+            col_v1, col_v2, col_v3 = st.columns([1, 1, 1])
+            with col_v2:
+                view_mode = st.radio(
+                    "Select Comparison Metric:",
+                    ["Distance (km)", "Percentage (%)"],
+                    horizontal=True,
+                    label_visibility="visible"
+                )
+
             path_a = os.path.join(DATA_FOLDER, sel_event_a, f"{sel_year_a}.csv")
             path_b = os.path.join(DATA_FOLDER, sel_event_b, f"{sel_year_b}.csv")
 
@@ -121,3 +124,5 @@ with analytics.track(unsafe_password=analytics_password):
             fig.update_layout(barmode='relative', bargap=0.15, showlegend=False, xaxis=dict(range=[-axis_range * 0.8, axis_range], showticklabels=False, showgrid=False, zeroline=False, fixedrange=True), yaxis=dict(title="", tickfont=dict(size=11), fixedrange=True), margin=dict(l=10, r=80, t=100, b=50), height=850, template="plotly_white")
 
             st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+        else:
+            st.info("Please select both an Event and a Year/Distance to view the comparison.")
