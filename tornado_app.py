@@ -47,7 +47,6 @@ with analytics.track(unsafe_password=analytics_password):
 
         with col1:
             st.markdown("#### Race A")
-            # Labels cleaned to "Select Event" and "Year/Distance"
             sel_event_a = st.selectbox("Select Event", [" "] + list(race_dict.keys()), key="event_picker_a")
             sel_year_a = " "
             if sel_event_a != " ":
@@ -55,7 +54,6 @@ with analytics.track(unsafe_password=analytics_password):
 
         with col2:
             st.markdown("#### Race B")
-            # Labels cleaned to "Select Event" and "Year/Distance"
             sel_event_b = st.selectbox("Select Event", [" "] + list(race_dict.keys()), key="event_picker_b")
             sel_year_b = " "
             if sel_event_b != " ":
@@ -91,7 +89,11 @@ with analytics.track(unsafe_password=analytics_password):
             x_col = 'Distance_km' if view_mode == "Distance (km)" else 'Perc'
             unit = "km" if view_mode == "Distance (km)" else "%"
 
-            merged = pd.merge(df_l[[y_col, x_col]], df_r[[y_col, x_col]], on=y_col, suffixes=('_a', '_b'))
+            # FIX: Use 'outer' merge so all bins from both races are included
+            # fillna(0) ensures that if a bin is missing in one race, it's treated as 0 instead of 'NaN'
+            merged = pd.merge(df_l[[y_col, x_col]], df_r[[y_col, x_col]], on=y_col, how='outer', suffixes=('_a', '_b')).fillna(0)
+            
+            # Recalculate delta using the filled values
             merged['delta'] = merged[f'{x_col}_b'] - merged[f'{x_col}_a']
 
             CUSTOM_COLORS = ["#803131", "#d63131", "#e77d31", "#efe331", "#d3d388", "#31d431", "#7fd1af", "#4ee6e6", "#3197e9", "#3b36db", "#682d94"]
@@ -117,12 +119,14 @@ with analytics.track(unsafe_password=analytics_password):
                 textposition='outside', cliponaxis=False
             ))
 
-            # Differences
+            # Differences (Now includes all bins thanks to outer merge)
             for i, row in merged.iterrows():
                 d_val = row['delta']
-                color = "black" if abs(d_val) <= 1.0 else ("#d63131" if d_val > 0 else "#3197e9")
+                color = "black" if abs(d_val) <= 0.05 else ("#d63131" if d_val > 0 else "#3197e9")
                 prefix = "+" if d_val > 0 else ""
-                fig.add_annotation(x=axis_range * 0.88, y=row[y_col], text=f"<b>{prefix}{d_val:.1f}{unit}</b>", showarrow=False, xanchor="right", font=dict(color=color, size=12))
+                # Only show annotation if there is actually a difference to show
+                if abs(d_val) > 0:
+                    fig.add_annotation(x=axis_range * 0.88, y=row[y_col], text=f"<b>{prefix}{d_val:.1f}{unit}</b>", showarrow=False, xanchor="right", font=dict(color=color, size=12))
 
             fig.add_annotation(x=axis_range * 0.88, y=1.08, xref="x", yref="paper", text="<b>Race B has:</b>", showarrow=False, xanchor="right", font=dict(size=13))
 
